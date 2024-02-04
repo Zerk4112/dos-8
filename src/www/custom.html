@@ -1,0 +1,132 @@
+﻿<html><head>
+<title>PICO-8 Cartridge</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<script src="pico-8-lib/pico-8.js"></script>
+
+<link rel="stylesheet" href="pico-8-lib/pico-8.css">
+
+</head>
+
+<!-- <body style="padding:0px; margin:0px; background-color:#222; color:#ccc"> -->
+<body style="padding:0px; margin:0px; background-color:#000000; color:#ccc; background-image: url('img/pc/crt_bezel.png'); background-size: contain; background-position: center; background-repeat: no-repeat;">
+
+<div id="body_0"> <!-- hide this when playing in mobile (p8_touch_detected) so that elements don't affect layout -->
+
+<script src="https://unpkg.com/pico8-gpio-listener"></script>
+<!-- Add any content above the cart here -->
+
+
+<!-- <div id="p8_frame_0" style="max-width:800px; max-height:800px; margin:auto;"> double function: limit size, and display only this div for touch devices -->
+<div id="p8_frame" style="display:flex; width:80%; max-width:95vw; height:80%; max-height:95vh; margin:auto;margin-top: 80px;">
+
+	<div id="p8_menu_buttons_touch" style="position:absolute; width:100%; z-index:10; left:0px;">
+		<div class="p8_menu_button" id="p8b_full"  style="float:left;margin-left:10px" onClick="p8_give_focus(); p8_request_fullscreen();"></div>
+		<div class="p8_menu_button" id="p8b_sound" style="float:left;margin-left:10px" onClick="p8_give_focus(); p8_create_audio_context(); Module.pico8ToggleSound();"></div>
+		<div class="p8_menu_button" id="p8b_close" style="float:right; margin-right:10px" onClick="p8_close_cart();"></div>
+	</div>
+
+	<div id="p8_container"
+		style="margin:auto; display:table;"
+		onclick="p8_create_audio_context(); p8_run_cart();">
+
+		<div id="p8_start_button" class="p8_start_button" style="width:100%; height:100%; display:none;">
+			<img width=80 height=80 style="margin:auto;"
+		src="data:image/png;base64,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Z2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNC40LjAtRXhpdjIiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iCiAgICB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIgogICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICAgeG1sbnM6R0lNUD0iaHR0cDovL3d3dy5naW1wLm9yZy94bXAvIgogICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iCiAgICB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iCiAgIHhtcE1NOkRvY3VtZW50SUQ9ImdpbXA6ZG9jaWQ6Z2ltcDpiMjNjYzJmZC1kN2RkLTQ1NDQtOTI0NC05MzRhZmZiNWMzMmQiCiAgIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZjA5NWVmMDYtMzgxNC00NzI3LWI1OTYtMGQyYmYxZjE4ZmI5IgogICB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MDIxYzg4MjAtYzc3Yi00MTBhLWI4NmItZDg5OTYzYzFhYjZjIgogICBkYzpGb3JtYXQ9ImltYWdlL3BuZyIKICAgR0lNUDpBUEk9IjIuMCIKICAgR0lNUDpQbGF0Zm9ybT0iV2luZG93cyIKICAgR0lNUDpUaW1lU3RhbXA9IjE3MDcwNzEwNDUwOTk0ODUiCiAgIEdJTVA6VmVyc2lvbj0iMi4xMC4zNCIKICAgdGlmZjpPcmllbnRhdGlvbj0iMSIKICAgeG1wOkNyZWF0b3JUb29sPSJHSU1QIDIuMTAiCiAgIHhtcDpNZXRhZGF0YURhdGU9IjIwMjQ6MDI6MDRUMTI6MjQ6MDItMDY6MDAiCiAgIHhtcDpNb2RpZnlEYXRlPSIyMDI0OjAyOjA0VDEyOjI0OjAyLTA2OjAwIj4KICAgPHhtcE1NOkhpc3Rvcnk+CiAgICA8cmRmOlNlcT4KICAgICA8cmRmOmxpCiAgICAgIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiCiAgICAgIHN0RXZ0OmNoYW5nZWQ9Ii8iCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NWJkZGYwMjktNjcxMS00MGY3LTlhYTQtNDU1YTE4MGM4OWFkIgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJHaW1wIDIuMTAgKFdpbmRvd3MpIgogICAgICBzdEV2dDp3aGVuPSIyMDI0LTAyLTA0VDEyOjI0OjA1Ii8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICA8L3JkZjpEZXNjcmlwdGlvbj4KIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0idyI/Phv7YWEAAAAGYktHRAAAAAAAAPlDu38AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfoAgQSGAUusuywAAABl0lEQVRYw81Xu5ECMQy1NDekVEEHtEEFxEQUQMgQUsPFV8GWQxWXkiwJWmShZ8veY+ec7OxYfu9ZP9uUGseYdmNpntJALXj0F6RzxFAz8WlfRrz+NAmhEPlpnwPb/4ANEsFhctm5Ry47tzbKWyiMBMkRkYzf7/x/fcC2Cst6guHOrTtbh16jsKwnOJRwJU/UktERr7k4qtx1eyQ0FU8ydL01jpAjW8eTwskhtwtgKdFsMmoRhXBQtdMh8loVBERTGoizsltqPLnGtBvpbfc6BKVdRPqAXg8qiqP9fPYAmJOA82b1OXIjYuLSAi63+2IpoLm+ulEiJRkYjCa0m+aOEhYjo8vt7jeV1m64PryFN8sBOR7FSCY/4QH5ChelgdhLkPNm9RK0PXafBbLWYsJWnBHbBVoASkBgg3ApDUT2dLLE2X/UC0/yEpaEnks16gFPIfFivT0WyxOGAHnBflsTD2HoeyG8lOoqsPHzBHlzHoa9lFLtWm5LBxEhci3UexuEHia9PaFG3vU0q4nxE63jafYvHqdLPM8fNMQhARoG6SUAAAAASUVORK5CYII="/>
+		</div>
+
+		<div id="p8_playarea" style="display:none; margin:auto;
+				-webkit-user-select:none; -moz-user-select: none; user-select: none; -webkit-touch-callout:none;
+		">
+
+			<div  id="touch_controls_background"
+				  style=" pointer-events:none; display:none; background-color:#000;
+						 position:fixed; top:0px; left:0px; border:0; width:100vw; height:100vh">
+				&nbsp
+			</div>
+
+			<div style="display:flex; position:relative">
+				<!-- pointer-events turned off for mobile in p8_update_layout because need for desktop mouse -->
+				<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault();" >
+				</canvas>
+				<div class=p8_menu_buttons id="p8_menu_buttons" style="margin-left:10px;">
+					<div class="p8_menu_button" style="position:absolute; bottom:125px" id="p8b_controls" onClick="p8_give_focus(); Module.pico8ToggleControlMenu();"></div>					
+					<div class="p8_menu_button" style="position:absolute; bottom:90px" id="p8b_pause" onClick="p8_give_focus(); Module.pico8TogglePaused(); p8_update_layout_hash = -22;"></div>
+					<div class="p8_menu_button" style="position:absolute; bottom:55px" id="p8b_sound" onClick="p8_give_focus(); p8_create_audio_context(); Module.pico8ToggleSound();"></div>
+					<div class="p8_menu_button" style="position:absolute; bottom:20px" id="p8b_full" onClick="p8_give_focus(); p8_request_fullscreen();"></div>
+				</div>
+			</div>
+
+
+			<!-- display after first layout update -->
+			<div  id="touch_controls_gfx"
+				  style=" pointer-events:none; display:table; 
+						 position:fixed; top:0px; left:0px; border:0; width:100vw; height:100vh">
+
+					<img src="" id="controls_right_panel" style="position:absolute; opacity:0.5;">
+					<img src="" id="controls_left_panel" style="position:absolute;  opacity:0.5;">
+						
+			
+			</div> <!-- touch_controls_gfx -->
+
+			<!-- used for clipboard access & keyboard input; displayed and used by PICO-8 only once needed. can be safely removed if clipboard / key presses not needed. -->
+			<!-- (needs to be inside p8_playarea so that it still works under Chrome when fullscreened) -->
+			<!-- 0.2.5: added "display:none"; pico8.js shows on demand to avoid mac osx accent character selector // https://www.lexaloffle.com/bbs/?tid=47743 -->
+
+			<textarea id="codo_textarea" class="emscripten" style="display:none; position:absolute; left:-9999px; height:0px; overflow:hidden"></textarea>
+
+		</div> <!--p8_playarea -->
+
+	</div> <!-- p8_container -->
+
+</div> <!-- p8_frame -->
+</div> <!-- p8_frame_0 size limit -->
+
+<script type="text/javascript">
+
+	p8_update_layout();
+	p8_update_button_icons();
+
+	var canvas = document.getElementById("canvas");
+	Module = {};
+	Module.canvas = canvas;
+
+	// from @ultrabrite's shell: test if an AudioContext can be created outside of an event callback.
+	// If it can't be created, then require pressing the start button to run the cartridge
+
+	if (p8_autoplay)
+		
+	{
+		console.log("p8_autoplay")
+		var temp_context = new AudioContext();
+		temp_context.onstatechange = function ()
+		{
+			if (temp_context.state=='running')
+			{
+				p8_run_cart();
+				temp_context.close();
+			}
+		};
+	}
+	
+	// pointer lock request needs to be inside a canvas interaction event
+	// pico8_state.request_pointer_lock is true when 0x5f2d bit 0 and bit 2 are set -- poke(0x5f2d,0x5) 
+	// note on mouse acceleration for future: // https://github.com/w3c/pointerlock/pull/49
+	canvas.addEventListener("click", function()
+	{
+		if (!p8_touch_detected)
+			if (pico8_state.request_pointer_lock)
+				canvas.requestPointerLock();
+	});
+	
+</script>
+
+
+
+<!-- Add content below the cart here -->
+
+
+
+
+</div> <!-- body_0 -->
+</body></html>
+
