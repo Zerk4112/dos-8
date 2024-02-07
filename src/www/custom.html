@@ -1,5 +1,5 @@
 ﻿<html><head>
-<title>PICO-8 Cartridge</title>
+<title>DOS-8</title>
 <meta name="viewport" content="width=device-width, user-scalable=no">
 <script src="pico-8-lib/pico-8.js"></script>
 
@@ -12,7 +12,6 @@
 
 <div id="body_0"> <!-- hide this when playing in mobile (p8_touch_detected) so that elements don't affect layout -->
 
-<script src="https://unpkg.com/pico8-gpio-listener"></script>
 <!-- Add any content above the cart here -->
 
 
@@ -126,7 +125,25 @@
 
 
 
-
 </div> <!-- body_0 -->
+
+<script src="script/pico8-gpio-listener.js"></script>
+<script src="script/dos8-gpio-lib.js"></script>
+<script src="script/dos8-gd.js"></script>
+
+<script>
+	var gpio = getP8Gpio();
+	var unsubscribe = gpio.subscribe(function(indices) {
+		
+		var values = {};
+		indices.forEach(function(i) {
+			values[i] = gpio[i];
+		});
+		
+		/* console.log('GPIO values changed:', values); */
+		window.dos8_idle(values);
+		
+	});
+</script>
 </body></html>
 
