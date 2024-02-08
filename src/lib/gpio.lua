@@ -8,8 +8,7 @@ function init_gpio()
     for i=8, 127 do
         add(data_pins, i)
     end
-    -- reset all pins
-    clear_pins(true)
+    
     clk_pin = 2
     control_mode = 0
     modes = {
@@ -17,9 +16,11 @@ function init_gpio()
         "receive",
         "send",
     }
-    data_stream = "this is a test sentence"
+    data_stream = "this is a test sentence in all lower case to help me out with testing a thing, oh boy is this sentence long! wow look at this really long sentence!"
     gpio_callback = function() printh("processing data_stream: "..data_stream) end
 
+    -- reset all pins
+    clear_pins(true)
     -- set data pin high
     -- poke(0x5f80 + data_pin, 255)
     -- create routine for updating gpio
@@ -50,6 +51,8 @@ function clear_pins(_ctrl)
     for i=8, 127 do
         poke(0x5f80 + i, 255)
     end
+    -- clear the clock pin
+    poke(0x5f80 + clk_pin, 255)
     
 end
 
@@ -70,11 +73,12 @@ end
 
 function read_data()
     local data = {}
-    for i=1, #data_pins do
-        if peek(0x5f80 + data_pins[i]) ~= 255 then
+    -- for i=1, #data_pins do
+    for i=8, 127 do
+        if peek(0x5f80 + i) ~= 255 then
             add(data, {
-                pin = data_pins[i],
-                value = peek(0x5f80 + data_pins[i])
+                pin = i,
+                value = peek(0x5f80 + i)
             })
         end
     end
@@ -84,9 +88,10 @@ end
 function receive_data()
     -- local data = peek(0x5f80 + data_pin)
     local data = read_data()
-    printh("received data: " .. #data)
     local clk_val = peek(0x5f80 + clk_pin)
     if #data>0 and clk_val==255 then
+        printh("received data: " .. #data)
+
         for i=1, #data do
             printh("received data async: " .. data[i].value.. " on pin: " .. data[i].pin)
             data_stream = data_stream .. allowed_keys[data[i].value+1]
@@ -108,21 +113,24 @@ end
 
 function send_data()
     if #data_stream>0 and peek(0x5f80 + clk_pin) == 0 then
-        for i=1, #data_pins do
+        -- for i=1, #data_pins do
+        for i=8, 127 do
             if #data_stream == 0 then
                 break
             end
             local data = sub(data_stream, 1, 1)
             data_stream = sub(data_stream, 2)
-            printh("sending data: " .. data)
-            poke(0x5f80 + data_pins[i], get_index_of_key(data))
+            printh("sending data: " .. data ..", index: " .. get_index_of_key(data) .. ", on pin: " .. i)
+            poke(0x5f80 + i, get_index_of_key(data))
+            
+            printh("pin value: " .. peek(0x5f80 + i))
         end
         -- local next_letter = sub(data_stream, 1, 1)
         -- data_stream = sub(data_stream, 2)
         -- printh("sending data: " .. next_letter)
         -- poke(0x5f80 + data_pin, get_index_of_key(next_letter))
         poke(0x5f80 + clk_pin, 255)
-    elseif #data_stream == 0 then
+    elseif #data_stream == 0 and peek(0x5f80 + clk_pin) == 0 then
         printh("no more data to send")
         clear_pins()
         -- poke(0x5f80 + clk_pin, 255)

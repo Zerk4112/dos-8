@@ -16,7 +16,10 @@ window.dos8_init_send = function(stringToSend) {
 
     window.dos8_data.data_stream = stringToSend.split("");
     window.pico8_gpio[0] = 1;
-    window.pico8_gpio[1] = 255;
+    // window.pico8_gpio[1] = 255;
+    for (i in window.dos8_data.data_pins) {
+        window.pico8_gpio[window.dos8_data.data_pins[i]] = 255;
+    }
     window.pico8_gpio[2] = 255;
 }
 
@@ -31,7 +34,10 @@ window.dos8_init_receive = function() {
 window.dos8_clear_buffer = function() {
     window.dos8_data.data_stream = new Array();
     window.pico8_gpio[0] = 1;
-    window.pico8_gpio[1] = 0;
+    // window.pico8_gpio[1] = 0;
+    for (i in window.dos8_data.data_pins) {
+        window.pico8_gpio[window.dos8_data.data_pins[i]] = 255;
+    }
     window.pico8_gpio[2] = 0;
 }
 
@@ -39,23 +45,32 @@ window.dos8_send_gpio = function () {
     // data is a string of characters to send
     if (window.dos8_data.control_mode == 1) {
         if (window.dos8_data.debug){
-            console.log("attempting to send data stream: "+window.dos8_data.data_stream);
-        }
-        if (window.dos8_data.debug){
             console.log("sending transcribed data stream: "+JSON.stringify(window.dos8_data.data_stream));
         }
         // send the data_stream to pico-8
-        if (window.pico8_gpio[2] == 255 && window.pico8_gpio[1] == 255 && window.dos8_data.data_stream.length > 0) {
+        if (window.pico8_gpio[2] == 255 && !window.dos8_check_data_pins() && window.dos8_data.data_stream.length > 0) {
             if (window.dos8_data.debug){
                 console.log("ready to send data stream")
             }
-            // extract the first character from the data_stream and send it to pico-8
-            var letter = window.dos8_data.data_stream.shift();
-            var index = window.dos8_data.allowed_keys.indexOf(letter);
-            window.pico8_gpio[1] = index;
-
+            var current_data_pin = 8;
+            var charsToProcess= window.dos8_data.data_stream.length;
+            for (i=0;i<charsToProcess;i++) {
+                var letter = window.dos8_data.data_stream.shift();
+                var index = window.dos8_data.allowed_keys.indexOf(letter);
+                window.pico8_gpio[current_data_pin] = index;
+                current_data_pin++;
+                if (current_data_pin > 127) {
+                    current_data_pin = 8;
+                    break;
+                } else if (i == charsToProcess-1) {
+                    window.dos8_data.data_stream = new Array();
+                }
+            }
+            for (i=0; i<current_data_pin-8; i++) {
+                window.dos8_data.data_stream.shift();
+            }
         }
-        else if (window.dos8_data.data_stream.length==0 && window.pico8_gpio[1] == 255) {
+        else if (window.dos8_data.data_stream.length==0 && window.pico8_gpio[2] == 255) {
             if (window.dos8_data.debug){
                 console.log("data stream is empty, setting control mode to 0");
             }
@@ -74,31 +89,58 @@ window.dos8_send_gpio = function () {
     }
 };
 
+window.dos8_check_data_pins = function () {
+    // check and see if all data pins are 255. If not, return false. esle, return true
+    for (i in window.dos8_data.data_pins) {
+        if (window.pico8_gpio[window.dos8_data.data_pins[i]] != 255) {
+            return true;
+        }
+    }
+    return false;
+};
+
+window.dos8_reset_data_pins = function () {
+    for (i in window.dos8_data.data_pins) {
+        window.pico8_gpio[window.dos8_data.data_pins[i]] = 255;
+    }
+};
+
+
 window.dos8_receive_gpio = function (data) {
     if (window.dos8_data.control_mode == 2) {
-        if (window.pico8_gpio[2] == 255 && window.pico8_gpio[1] == 255) {
+        console.log(window.pico8_gpio)
+        console.log("control mode is 2, receiving data stream")
+        console.log("data: "+JSON.stringify(data));
+        console.log("data pins on:"+window.dos8_check_data_pins())
+        console.log("clock pin: "+window.pico8_gpio[2])
+        if (window.pico8_gpio[2] == 255 && window.dos8_check_data_pins()) { //&& window.pico8_gpio[1] == 255
             if (window.dos8_data.debug){
                 console.log("ready to receive data stream")
             }
-            window.pico8_gpio[2] = 0;
-        }
-        else if (window.pico8_gpio[2] == 0 && window.pico8_gpio[1] != 255) {
             if (window.dos8_data.debug){
-                console.log("receiving data stream: "+data);
-                console.log("current data stream: "+window.dos8_data.data_stream+" typeof: "+typeof(window.dos8_data.data_stream));
+                console.log("receiving data stream: "+JSON.stringify(data));
+                console.log("current data stream: "+window.dos8_data.data_stream+", typeof: "+typeof(window.dos8_data.data_stream));
             }
-            window.dos8_data.data_stream.push(data);
-            window.pico8_gpio[1] = 255;
+            for (var pin=8; pin<=127;pin++) {
+                var value = gpio[pin];
+                if (value != 255 && value != undefined) {
+                    console.log("pin: "+pin+", value: "+value, ",letter: "+window.dos8_data.allowed_keys[value-1])
+                    window.dos8_data.data_stream.push(value-1);
+                    gpio[pin] = 255;
+                }
+
+            }
+            window.pico8_gpio[2] = 0;
         }
     }
 };
 
 window.dos8_idle = function (gpioStream) {
     if (window.dos8_data.data_pins.length == 0) {
-        for (i=8;i<127;i++) {
+        for (i=8;i<=127;i++) {
             window.dos8_data.data_pins.push(i);
         }
-        console.log("set up data pins")
+        // console.log("set up data pins")
     }
     var vkeys = Object.keys(gpioStream);
     if (window.dos8_data.debug){
@@ -111,11 +153,12 @@ window.dos8_idle = function (gpioStream) {
             console.log("control pin is being set to: "+gpioStream[0]);
         }
         if (gpioStream[0] == 0) {
+            // console.log("gpio control mode is 0")
             // set control mode to 0
             if (window.dos8_data.control_mode == 2) {
-                // process the data stream that was sent from pico-8
-                // for each character in the data stream, convert it to a character from the available_keys array based on the value as the index of the letter in the array and add it to the data_stream
+                // console.log("saved control mode is 2, translating data")
                 var translated_data = "";
+                // console.log("data_stream: "+JSON.stringify(window.dos8_data.data_stream))
                 for (bit in window.dos8_data.data_stream) {
                     var letter = window.dos8_data.allowed_keys[window.dos8_data.data_stream[bit]];
                     if (window.dos8_data.debug){
@@ -139,13 +182,18 @@ window.dos8_idle = function (gpioStream) {
             window.dos8_data.control_mode = 2;
         }
 
-    }
-    if (vkeys.indexOf("1")>-1) {
-        if (window.dos8_data.debug){
-            console.log("data pin is being set to: "+gpioStream[1]);
-        }
-        window.dos8_receive_gpio(gpioStream[1]-1);
+    } else if (!window.dos8_check_data_pins() && window.dos8_data.control_mode == 1 && window.pico8_gpio[2] == 255 && window.dos8_data.data_stream.length == 0) {
+        console.log("data stream is finished sending, setting clock to 0")
+        // window.pico8_gpio[2] = 0;
+
+    } else if (!window.dos8_check_data_pins() && window.dos8_data.control_mode == 1 && window.pico8_gpio[2] == 255 && window.dos8_data.data_stream.length > 0) {
+        console.log("data still being sent, send more data")
         window.dos8_send_gpio();
+    }
+    if (window.dos8_check_data_pins()) {
+        console.log("data pins are being written to")
+        window.dos8_receive_gpio(gpioStream);
+        
     }
 };
 
