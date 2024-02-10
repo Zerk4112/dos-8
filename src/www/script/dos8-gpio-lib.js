@@ -21,13 +21,14 @@ window.dos8_init_send = function(stringToSend) {
         window.pico8_gpio[window.dos8_data.data_pins[i]] = 255;
     }
     window.pico8_gpio[2] = 255;
+    gpio[1] = 255;
 }
 
 window.dos8_init_receive = function() {
 
     window.dos8_data.data_stream = new Array();
     window.pico8_gpio[0] = 2;
-    window.pico8_gpio[1] = 255;
+    // window.pico8_gpio[1] = 255;
     window.pico8_gpio[2] = 0;
 }
 
@@ -108,11 +109,11 @@ window.dos8_reset_data_pins = function () {
 
 window.dos8_receive_gpio = function (data) {
     if (window.dos8_data.control_mode == 2) {
-        console.log(window.pico8_gpio)
-        console.log("control mode is 2, receiving data stream")
-        console.log("data: "+JSON.stringify(data));
-        console.log("data pins on:"+window.dos8_check_data_pins())
-        console.log("clock pin: "+window.pico8_gpio[2])
+        // console.log(window.pico8_gpio)
+        // console.log("control mode is 2, receiving data stream")
+        // console.log("data: "+JSON.stringify(data));
+        // console.log("data pins on:"+window.dos8_check_data_pins())
+        // console.log("clock pin: "+window.pico8_gpio[2])
         if (window.pico8_gpio[2] == 255 && window.dos8_check_data_pins()) { //&& window.pico8_gpio[1] == 255
             if (window.dos8_data.debug){
                 console.log("ready to receive data stream")
@@ -168,6 +169,12 @@ window.dos8_idle = function (gpioStream) {
 
                 }
                 console.log("translated_data: "+translated_data);
+                // strip out any backslashes
+                translated_data = translated_data.replace(/\\/g, "");
+                var translated_json = JSON.parse(translated_data)
+                console.log("translated_json: "+translated_json);
+                // use the translated data to make a comment
+                addComment(translated_json.name, translated_json.message);
                 window.dos8_data.data_stream = new Array();
             }
             window.dos8_data.control_mode = 0;
@@ -181,9 +188,26 @@ window.dos8_idle = function (gpioStream) {
             // set control mode to 2
             window.dos8_data.control_mode = 2;
         }
+        else if (gpioStream[0] == 3) {
+            // set control mode to 3
+            window.dos8_data.control_mode = 3;
+            fetchComments(true);
+        } else if (gpioStream[0] == 4) {
+            // set control mode to 4
+            // comments have been fetched and need to be processed
+            window.dos8_data.control_mode = 4;
+            // returned_data is a stringified array of comment objects. This object needs to be converted into a stringified lua table for processing on the pico 8
+
+
+            // load the comments into the data_stream
+            window.dos8_init_send(returned_data);
+            returned_data = null;
+            // window.dos8_data.data_stream = returned_data.split("");
+        }
 
     } else if (!window.dos8_check_data_pins() && window.dos8_data.control_mode == 1 && window.pico8_gpio[2] == 255 && window.dos8_data.data_stream.length == 0) {
         console.log("data stream is finished sending, setting clock to 0")
+        gpio[1] = 0;
         // window.pico8_gpio[2] = 0;
 
     } else if (!window.dos8_check_data_pins() && window.dos8_data.control_mode == 1 && window.pico8_gpio[2] == 255 && window.dos8_data.data_stream.length > 0) {

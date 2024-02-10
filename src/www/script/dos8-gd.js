@@ -1,6 +1,6 @@
 returned_data = null;
 function addComment(name, comment) {
-
+    console.log("Adding comment: ", name, comment);
     var timestamp = new Date().toLocaleString(); // Add a timestamp
     
     // Construct the Google Sheets URL with query parameters
@@ -15,7 +15,7 @@ function addComment(name, comment) {
         mode: "no-cors" // Enable CORS (Cross-Origin Resource Sharing)
     }).then(function(response) {
         // Handle response if needed
-        console.log("Comment submitted successfully!");
+        console.log("Comment submitted successfully: ", response);
     }).catch(function(error) {
         console.error("Error submitting comment:", error);
     });
@@ -25,7 +25,7 @@ function fetchComments(force) {
     if (sessionStorage.getItem("comment_store")!=null && !force) {
         console.log("Using stored comments")
         returned_data = sessionStorage.getItem("comment_store");
-        
+        gpio[0]=4;
     } else {
         console.log("Fetching comments")
         fetch('http://localhost:3000/comments', {
@@ -42,9 +42,11 @@ function fetchComments(force) {
             returned_data = returned_data.toLowerCase();
             console.log("returned_data: "+returned_data);
             sessionStorage.setItem("comment_store", returned_data);
+            gpio[0]=4;
         })
         .catch(error => {
             console.error('Error fetching comments:', error);
+            gpio[4]=1;
             return error;
         });
     }
