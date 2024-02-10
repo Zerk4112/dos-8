@@ -116,7 +116,11 @@ function upd_k()
                         current_dir = files[current_drive]["/"]
                     else
                         printh("pass incorrect")
-                        add(keys_history, "pASSWORD: "..pass_str)
+                        local pbuff = ""
+                        for i=1,#keys_buffer do
+                            pbuff = pbuff.."*"
+                        end
+                        add(keys_history, "pASSWORD: "..pbuff)
                         add(keys_history, "pASSWORD INCORRECT")
                         add(keys_history, "")
                         keys_buffer = ""
@@ -202,7 +206,11 @@ function draw_k()
         if user == nil and pass == nil then
             print("uSER: "..keys_buffer, keys_x, keys_y, 7)
         elseif user ~= nil and pass == nil then
-            print("pASSWORD: "..keys_buffer, keys_x, keys_y, 7)
+        local pbuff = ""
+        for i=1,#keys_buffer do
+            pbuff = pbuff.."*"
+        end
+            print("pASSWORD: "..pbuff, keys_x, keys_y, 7)
         end
     end
 

@@ -46,8 +46,8 @@ function _init()
     program_callback = nil
     loaded_program = nil
     loaded_disk = nil
-    user = "zerk"
-    pass = "dev"
+    user = nil
+    pass = nil
     more = false
     os_name = "dos-8"
     bkgr_clr = 0
