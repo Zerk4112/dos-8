@@ -45,15 +45,15 @@ function fetchComments(force) {
             const rows = JSON.parse(json[1]).table.rows.map(row => row.c.map(cell => cell.v));
 
             // Combine the columns and rows into an array of objects
-            const comments = rows.map(row => {
+            var comments = rows.map(row => {
                 return row.reduce((acc, cell, index) => {
                     acc[columns[index]] = cell;
                     return acc;
                 }, {});
             });
             comments = JSON.stringify(comments);
-            console.log("data: "+data);
-            returned_data = data;
+            console.log("comments: "+comments);
+            returned_data = comments;
             // set all characters to lowercase
             returned_data = returned_data.toLowerCase();
             returned_data = JSON.parse(returned_data);
