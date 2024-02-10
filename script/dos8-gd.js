@@ -2,7 +2,9 @@ returned_data = null;
 function addComment(name, comment) {
     console.log("Adding comment: ", name, comment);
     var timestamp = new Date().toLocaleString(); // Add a timestamp
-    
+    // var timestamp = new Date().toISOString(); // Add a timestamp
+    // define the timestamp as a timezone aware string for the users local timezone
+
     // Construct the Google Sheets URL with query parameters
     var sheetsURL = "https://docs.google.com/forms/d/e/1FAIpQLSf7V0IppAxTj4I464fqXmJAWlsLGVBV9h2Bi6q3oEZEECuqoQ/formResponse?";
     var formData = "entry.362293735=" + name +

@@ -172,7 +172,7 @@ function word_wrap(_w)
 end
 
 function draw_k()
-    print("kb: "..#keys_buffer, 0, 112, 7)
+    -- print("kb: "..#keys_buffer, 0, 112, 7)
     if user ~= nil and pass ~= nil then
         if program_running==false then
             print(current_drive..current_path..">"..keys_buffer, keys_x, keys_y+scroll_y, 7)

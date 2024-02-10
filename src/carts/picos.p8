@@ -189,6 +189,10 @@ function init_filesystem()
                                         return
                                     else
                                         loaded_program = file.func
+                                        add(keys_history, "pROGRAM LOADED.")
+                                        add(keys_history, "")
+                                        keys_y += 16
+                                        
                                     end
                                 end
                             },
@@ -773,6 +777,8 @@ function init_filesystem()
                                                 key_lock = false
                                                 program_running = false
                                                 return
+                                            elseif #keys_buffer>0 and (not find_char_in_string(keys_buffer, "n") or #keys_buffer>0 and find_char_in_string(keys_buffer, "y")) then
+                                                keys_buffer=""
                                             end
                                             yield()
                                         end
