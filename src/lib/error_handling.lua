@@ -17,21 +17,17 @@ function init_bsod()
 end
 
 function update_bsod()
-    -- poke(0x5f2d, 1)
-    -- printh("checking for key press")
     if stat(30) and reset then
-
         yields(60)
         run()
     else
         if stat(30) then
 
             bsod = false
-
+            bsod_message = {}
         end
     end
 end
-
 function draw_bsod()
     if bsod then
         bsod_x=0
@@ -41,9 +37,7 @@ function draw_bsod()
         print("sYSTEM", bsod_x+51, bsod_y+2, 12)
         bsod_y+=14
 
-        -- for each line in bsod_message, print it to the screen using the x and y coordinates
         for i = 1, #bsod_message do
-            -- wrap line if it's too long
             local line = bsod_message[i]
             local line_max = 32
             

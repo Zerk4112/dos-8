@@ -1,5 +1,3 @@
--- json parser
--- from: https://gist.github.com/tylerneylon/59f4bcf316be525b30ab
 local function error(str)
 	printh("error"..str)
 	assert()
@@ -82,15 +80,36 @@ function json_parse(str, pos, end_delim)
 	end
 end
 
-function table_print(t)
-	for k,v in pairs(t) do
-		if type(v)=="table" then
-			printh(k..":{")
-			table_print(v)
-			printh("}")
+function table_print(_t, r)
+	local stringified = ''
+	if (r==nil) stringified = '{'
+	printh('table_print')
+	local i = 0
+	for k,v in pairs(_t) do
+		i+=1
+		printh("i: "..i.."/ #_t: "..len(_t).." k: "..k.." v: "..v)
+		if type(v)=='table' then
+			printh('"'..k..'":{ ')
+			stringified = stringified..'"'..k..'":{ '
+			stringified = stringified..table_print(v, '')
+			printh('}, ')
+			stringified = stringified..'}, '
 		else
-			printh(k..":"..v)
+			local s = ","
+			if (i==len(_t)) s = ""
+			printh('"'..k..'": "'..v..'"'..s)
+			stringified = stringified..'"'..k..'": "'..v..'"'..s
 		end
 	end
+	if (r==nil) stringified = stringified..'}'
+	printh('stringified: '..stringified)
+	return stringified
 end
 
+function len(_t)
+	local i = 0
+	for k,v in pairs(_t) do
+		i+=1
+	end
+	return i
+end

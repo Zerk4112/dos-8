@@ -3,7 +3,8 @@
 function init_gpio()
     printh("initializing gpio")
     control_pin = 0
-    data_pin = 1
+    fetch_pin = 1
+    error_pin = 4
     data_pins = {}
     for i=8, 127 do
         add(data_pins, i)
@@ -15,15 +16,11 @@ function init_gpio()
         "idle",
         "receive",
         "send",
+        "fetch"
     }
-    data_stream = "this is a test sentence in all lower case to help me out with testing a thing, oh boy is this sentence long! wow look at this really long sentence!"
+    data_stream = ""
     gpio_callback = function() printh("processing data_stream: "..data_stream) end
-
-    -- reset all pins
     clear_pins(true)
-    -- set data pin high
-    -- poke(0x5f80 + data_pin, 255)
-    -- create routine for updating gpio
     gpio_routine = make_cr(function()
         while true do
             gpio_update()
@@ -58,22 +55,28 @@ end
 
 
 function gpio_update()
+    if peek(0x5f80 + error_pin) == 1 then
+        printh("error detected, clearing pins")
+        clear_pins(true)
+        throw_bsod("unable to fetch data from bbs", false)
+    end
     local prev_mode = control_mode
     control_mode = peek(0x5f80 + control_pin)
     if control_mode == 0 then
-        -- printh("nothing is happening, waiting for input")
     elseif control_mode == 1 and prev_mode==control_mode then
-        -- printh("receiving data")
         receive_data()
     elseif control_mode == 2 and prev_mode==control_mode then
-        -- printh("sending data")
         send_data()
+    elseif control_mode == 3 and prev_mode==control_mode then
+        printh("asking for data_stream from javascript")
+        if (peek(0x5f80 + fetch_pin)==0) poke(0x5f80 + fetch_pin, 255) -- switch to receive mode
+    elseif control_mode == 4 and prev_mode==control_mode then
+        printh("javascript has sent data_stream, processing it")
     end
 end
 
 function read_data()
     local data = {}
-    -- for i=1, #data_pins do
     for i=8, 127 do
         if peek(0x5f80 + i) ~= 255 then
             add(data, {
@@ -86,7 +89,6 @@ function read_data()
 end
 
 function receive_data()
-    -- local data = peek(0x5f80 + data_pin)
     local data = read_data()
     local clk_val = peek(0x5f80 + clk_pin)
     if #data>0 and clk_val==255 then
@@ -97,10 +99,6 @@ function receive_data()
             data_stream = data_stream .. allowed_keys[data[i].value+1]
             poke(0x5f80 + data[i].pin, 255)
         end
-        -- local letter = allowed_keys[data+1]
-        -- printh("received data: " .. letter)
-        -- data_stream = data_stream .. letter
-        -- poke(0x5f80 + data_pin, 255)
     elseif clk_val ~= 255 then
         printh("receive is finished, switching back to idle mode")
         gpio_callback()
@@ -108,12 +106,10 @@ function receive_data()
         
         poke(0x5f80 + control_pin, 0)
     end
-    -- data_stream = data_stream .. data
 end
 
 function send_data()
     if #data_stream>0 and peek(0x5f80 + clk_pin) == 0 then
-        -- for i=1, #data_pins do
         for i=8, 127 do
             if #data_stream == 0 then
                 break
@@ -125,20 +121,10 @@ function send_data()
             
             printh("pin value: " .. peek(0x5f80 + i))
         end
-        -- local next_letter = sub(data_stream, 1, 1)
-        -- data_stream = sub(data_stream, 2)
-        -- printh("sending data: " .. next_letter)
-        -- poke(0x5f80 + data_pin, get_index_of_key(next_letter))
         poke(0x5f80 + clk_pin, 255)
     elseif #data_stream == 0 and peek(0x5f80 + clk_pin) == 0 then
         printh("no more data to send")
         clear_pins()
-        -- poke(0x5f80 + clk_pin, 255)
-        poke(0x5f80 + data_pin, 0)
         poke(0x5f80 + control_pin, 0)
     end
-    -- local data = string.sub(data_stream, 1, 1)
-    -- data_stream = string.sub(data_stream, 2)
-    -- poke(0x5f80 + data_pin, data)
-    -- printh("sent data: " .. data)
 end
