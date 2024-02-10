@@ -632,8 +632,9 @@ function init_filesystem()
                                                 add(keys_history, "--------------------------------")
                                                 keys_y+=8
                                                 add(keys_history, name)
-                                                add(keys_history, "\t\t\t"..timestamp)
-                                                keys_y += 16
+                                                add(keys_history, "\t\t"..timestamp)
+                                                add(keys_history, "")
+                                                keys_y += 24
                                                 for i=1, #lines do
                                                     add(keys_history, lines[i])
                                                     keys_y += 8
