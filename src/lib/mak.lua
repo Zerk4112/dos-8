@@ -157,13 +157,44 @@ function upd_k()
     
 end
 
+function word_wrap(_w)
+    local w = _w or 31
+    local lines = {}
+    local line = ""
+    for i=1, #keys_buffer do
+        line = line..sub(keys_buffer, i, i)
+        if #line >w or i==#keys_buffer then
+            add(lines, line)
+            line = ""
+        end
+    end
+    return lines
+end
+
 function draw_k()
+    print("kb: "..#keys_buffer, 0, 112, 7)
     if user ~= nil and pass ~= nil then
         if program_running==false then
             print(current_drive..current_path..">"..keys_buffer, keys_x, keys_y+scroll_y, 7)
         elseif program_running then
             if (spkeys_prompt==nil) spkeys_prompt=""
-            print(spkeys_prompt..keys_buffer, keys_x, keys_y+scroll_y, 7)
+            -- lines = {}
+            -- line = ""
+            -- for i=1, #keys_buffer do
+            --     line = line..sub(keys_buffer, i, i)
+            --     if #line >31 or i==#keys_buffer then
+            --         add(lines, line)
+            --         line = ""
+            --     end
+            -- end
+            local lines = word_wrap()
+            if (#lines>0 )print(spkeys_prompt..lines[1], keys_x, keys_y+scroll_y, 7)
+            if #lines>1 then
+                for i=2, #lines do
+                    print(spkeys_prompt..lines[i], keys_x, keys_y+8*(i-1)+scroll_y, 7)
+                end
+            end
+            if (#lines==0) print(spkeys_prompt..keys_buffer, keys_x, keys_y+scroll_y, 7)
         end
         -- draw keys history above the input like in linux terminal in reverse order
         
