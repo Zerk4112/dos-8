@@ -56,7 +56,6 @@ function fetchComments(force) {
             returned_data = comments;
             // set all characters to lowercase
             returned_data = returned_data.toLowerCase();
-            returned_data = JSON.parse(returned_data);
             console.log("returned_data: "+returned_data);
             sessionStorage.setItem("comment_store", returned_data);
             gpio[0]=4;
