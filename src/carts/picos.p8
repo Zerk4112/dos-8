@@ -124,14 +124,12 @@ function init_filesystem()
                                 help_long = {
                                     "rUN LOADED PROGRAM : rUN",
                                     "    rUNS THE PROGRAM LOADED INTO MEMORY.",
-                                    "    nO ARGUMENTS."
+                                    "    aRGUMENTS DEPEND ON LOADED PROGRAM."
                                 },
                                 func = function(self, args) 
                                     printh("running loaded program: "..tostr(loaded_program))
                                     if loaded_program == nil then
-                                        add(keys_history, "nO PROGRAM LOADED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nO PROGRAM LOADED.")
                                         sfx(1)
                                         return
                                     else
@@ -170,29 +168,17 @@ function init_filesystem()
                                     local dir = get_dir_from_path(current_path)
                                     local file = dir.contents[filename]
                                     if filename == "" then
-                                        add(keys_history, "nO FILE SPECIFIED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nO FILE SPECIFIED.")
                                         sfx(1)
-                                        return
                                     elseif file == nil then
-                                        add(keys_history, "fILE NOT FOUND.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("fILE NOT FOUND.")
                                         sfx(1)
-                                        return
                                     elseif file.type ~= "exe" then
-                                        add(keys_history, "nOT AN EXECUTABLE.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nOT AN EXECUTABLE.")
                                         sfx(1)
-                                        return
                                     else
                                         loaded_program = file.func
-                                        add(keys_history, "pROGRAM LOADED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
-                                        
+                                        add_line("pROGRAM LOADED.")
                                     end
                                 end
                             },
@@ -210,9 +196,7 @@ function init_filesystem()
                                     for k, v in pairs(args) do
                                         str = str..v.." "
                                     end
-                                    add(keys_history, str)
-                                    add(keys_history, "")
-                                    keys_y += 16
+                                    add_line(str)
                                 end
                             },
                             ["dir"] = {
@@ -236,20 +220,17 @@ function init_filesystem()
                                         end
                                     end
                                     for k, v in pairs(dirs) do
-                                        add(keys_history, v.."  \t"..dir.contents[v].type)
-                                        keys_y += 8
+                                        add_line(v.."  \t"..dir.contents[v].type, "")
                                     end
                                     for k, v in pairs(files) do
                                         if #v<=4 then
-                                            add(keys_history, v.."  \t"..dir.contents[v].type)
+                                            add_line(v.."  \t"..dir.contents[v].type, "")
                                         else
-                                            add(keys_history, v.."\t"..dir.contents[v].type)
+                                            add_line(v.."  \t"..dir.contents[v].type, "")
                                         end
                                         print(v, 0, keys_y, 8)
-                                        keys_y += 8
                                     end
-                                    add(keys_history, "")
-                                    keys_y += 8
+                                    add_line("", "")
                                 end
                             },
                             ["type"] = {
@@ -265,21 +246,15 @@ function init_filesystem()
                                     local dir = get_dir_from_path(current_path)
                                     local file = dir.contents[filename]
                                     if filename == "" then
-                                        add(keys_history, "nO FILE SPECIFIED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nO FILE SPECIFIED.")
                                         sfx(1)
                                         return
                                     elseif file == nil then
-                                        add(keys_history, "fILE NOT FOUND.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("fILE NOT FOUND.")
                                         sfx(1)
                                         return
                                     elseif file.type ~= "txt" then
-                                        add(keys_history, "nOT A TEXT FILE.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nOT A TEXT FILE.")
                                         sfx(1)
                                         return
                                     else
@@ -297,11 +272,9 @@ function init_filesystem()
                                         end
 
                                         for k, v in pairs(lines) do
-                                            add(keys_history, v)
-                                            keys_y += 8
+                                            add_line(v, "")
                                         end
-                                        add(keys_history, "")
-                                        keys_y += 8
+                                        add_line("", "")
 
                                     end
                                 end
@@ -318,9 +291,7 @@ function init_filesystem()
                                 },
                                 func = function(self, dir) 
                                     if dir == nil or dir == "" or dir == "." then
-                                        add(keys_history, current_drive..current_path)
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line(current_drive..current_path)
                                     elseif dir == ".." then
                                         if current_path == "/" then
                                             return
@@ -352,21 +323,15 @@ function init_filesystem()
                                         printh("new_dir: "..tostr(new_dir))
                                         printh("new_path: "..tostr(new_path))
                                         if new_dir == nil then
-                                            add(keys_history, "pATH SPECIFIED IS INVALID.")
-                                            add(keys_history, "")
-                                            keys_y += 16
+                                            add_line("pATH SPECIFIED IS INVALID.")
                                             sfx(1)
                                             return
                                         elseif new_dir.type ~= "dir" then
-                                            add(keys_history, "nOT A DIRECTORY.")
-                                            add(keys_history, "")
-                                            keys_y += 16
+                                            add_line("nOT A DIRECTORY.")
                                             sfx(1)
                                             return
                                         elseif check_permissions(new_dir) == false and new_dir.permissions then
-                                            add(keys_history, "aCCESS dENIED.")
-                                            add(keys_history, "")
-                                            keys_y += 16
+                                            add_line("aCCESS dENIED.")
                                             sfx(1)
                                             return
                                         end
@@ -387,21 +352,15 @@ function init_filesystem()
                                     local dir = get_dir_from_path(current_path)
                                     local file = dir.contents[filename]
                                     if filename == "" then
-                                        add(keys_history, "nO FILE SPECIFIED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nO FILE SPECIFIED.")
                                         sfx(1)
                                         return
                                     elseif file == nil then
-                                        add(keys_history, "fILE NOT FOUND.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("fILE NOT FOUND.")
                                         sfx(1)
                                         return
                                     elseif file.type ~= "txt" then
-                                        add(keys_history, "nOT A TEXT FILE.")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("nOT A TEXT FILE.")
                                         sfx(1)
                                         return
                                     else
@@ -442,9 +401,7 @@ function init_filesystem()
                                     if topic == "" then
                                         keys_history = {}
                                         keys_y = -8
-                                        add(keys_history, "aVAILABLE COMMANDS:")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("aVAILABLE COMMANDS:")
                                         local coms = files[current_drive]["/"].contents["bin"].contents
                                         for k, v in pairs(coms) do
                                             if v.type == "com" then
@@ -466,22 +423,17 @@ function init_filesystem()
                                                 keys_y += 8
                                             end
                                         end
-                                        add(keys_history, "")
-                                        keys_y += 8
+                                        add_line("","")
                                     else
                                         keys_history = {}
                                         keys_y = 16
                                         local com = files[current_drive]["/"].contents["bin"].contents[topic]
                                         if com == nil then
-                                            add(keys_history, "cOMMAND NOT FOUND.")
-                                            add(keys_history, "")
-                                            keys_y += 16
+                                            add_line("cOMMAND NOT FOUND.")
                                             sfx(1)
                                             return
                                         end
-                                        add(keys_history, "hELP FOR "..topic..":")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("hELP FOR "..topic..":")
                                         for k, v in pairs(com.help_long) do
                                             local line = v
                                             if #line > 29 then
@@ -491,8 +443,7 @@ function init_filesystem()
                                                 add(keys_history, str2)
                                                 keys_y+=8
                                             else
-                                                add(keys_history, line)
-                                                keys_y += 8
+                                                add_line(line, "")
                                             end
                                         end
                                         add(keys_history, "")
@@ -515,46 +466,6 @@ function init_filesystem()
                                 type = "exe",
                                 func = mouse_init
                             },
-                            ["receive"] = {
-                                type = "exe",
-                                func = function()
-                                    if data_stream == "" then
-                                        add(keys_history, "nO MESSAGE RECEIVED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
-                                        sfx(1)
-                                        return
-                                    end
-                                    printh("receiving message")
-                                    add(keys_history, data_stream)
-                                    keys_y += 8
-
-                                    add(keys_history, "mESSAGE RECEIVED.")
-                                    add(keys_history, "")
-                                    keys_y += 16
-                                    data_stream = ""
-                                end
-                            },
-                            ["send"] = {
-                                type = "exe",
-                                func = function(m)
-                                    printh("sending message: "..tostr(m))
-                                    if m=="" then
-                                        add(keys_history, "nO MESSAGE SPECIFIED.")
-                                        add(keys_history, "")
-                                        keys_y += 16
-                                        sfx(1)
-                                        return
-                                    end
-                                    data_stream = m
-                                    add(keys_history, "mESSAGE SENT.")
-                                    add(keys_history, "")
-                                    keys_y += 16
-
-                                    poke(0x5f80 + control_pin,2)
-                                    poke(0x5f80 + clk_pin,0)
-                                end
-                            }
                         }
                     },
                     ["home"] = {
@@ -596,9 +507,7 @@ function init_filesystem()
                                         keys_history = {}
                                         keys_y = 8
                                         
-                                        add(keys_history, "fetching bbs data...")
-                                        add(keys_history, "")
-                                        keys_y += 16
+                                        add_line("fetching bbs data...")
 
                                         key_lock = true
                                         poke(0x5f80 + control_pin,3) 
@@ -616,12 +525,10 @@ function init_filesystem()
                                             printh("data_stream: "..data_stream)
                                             add(keys_history, "lOADING bbs bROWSER...")
 
-
                                             yields(30)
 
                                             keys_history = {}
                                             keys_y = -8
-                                            -- add(keys_history, "bbs eNTRIES:")
                                             for comment in all(data) do
                                                 local name = comment.name
                                                 local message = comment.comment
@@ -633,27 +540,22 @@ function init_filesystem()
                                                 end
 
 
-                                                add(keys_history, "--------------------------------")
-                                                keys_y+=8
-                                                add(keys_history, "nAME: \t"..name)
-                                                add(keys_history, "tIME: \t"..timestamp)
-                                                add(keys_history, "mESSAGE: ")
-                                                add(keys_history, "")
-                                                keys_y += 24
+                                                add_line("--------------------------------", "")
+                                                add_line("nAME: \t"..name, "")
+                                                add_line("tIME: \t"..timestamp, "")
+                                                add_line("mESSAGE: ")
                                                 for i=1, #lines do
-                                                    add(keys_history, lines[i])
-                                                    keys_y += 8
+                                                    add_line(lines[i], "")
                                                 end
 
 
                                             keys_y += 8
                                             end
-                                            add(keys_history, "--------------------------------")
-                                            keys_y += 8
-                                            add(keys_history, "^^----messages----^^")
-                                            add(keys_history, "uSE ARROW KEYS TO NAVIGATE")
-                                            add(keys_history, "pRESS ANY OTHER KEY TO EXIT")
-                                            keys_y += 24
+                                            add_line("--------------------------------", "")
+                                            add_line("^^----messages----^^", "")
+
+                                            add_line("uSE ARROW KEYS TO NAVIGATE", "")
+                                            add_line("pRESS ANY OTHER KEY TO EXIT", "")
                                             local cy = keys_y
                                             scroll_y-=keys_y-120
                                             key_lock=true
@@ -687,9 +589,8 @@ function init_filesystem()
                                         scroll_y=0
                                         key_lock = true
                                         -- prompt user to confirm that they want to post
-                                        add(keys_history, "yOU ARE ABOUT TO POST TO THE BBS")
-                                        add(keys_history, "CONTINUE? (y/n)")
-                                        keys_y += 32
+                                        add_line("yOU ARE ABOUT TO POST TO THE BBS", "")
+                                        add_line("CONTINUE? (y/n)", "")
                                         while true do
                                             if #keys_buffer>0 and find_char_in_string(keys_buffer, "y") then
                                                 local data = {}
@@ -701,8 +602,7 @@ function init_filesystem()
                                                         keys_buffer = sub(keys_buffer, 1, 10)
                                                     end
                                                     if #keys_buffer>0 and key_pressed==2 then
-                                                        add(keys_history, "nAME: "..keys_buffer)
-                                                        keys_y += 8
+                                                        add_line("nAME: "..keys_buffer, "")
                                                         data.name = keys_buffer
                                                         keys_buffer = ""
                                                         break
@@ -712,16 +612,12 @@ function init_filesystem()
                                                 
                                                 -- spkeys_prompt="mESSAGE: "
                                                 spkeys_prompt=""
-                                                add(keys_history, "mESSAGE: ")
-                                                keys_y += 8
+                                                add_line("mESSAGE: ", "")
                                                 while true do
                                                     if #keys_buffer>0 and key_pressed==2 then
                                                         local lines = word_wrap()
-                                                        -- add(keys_history, "mESSAGE: ")
-                                                        -- keys_y+=8
                                                         for i=1, #lines do
-                                                            add(keys_history, lines[i])
-                                                            keys_y+=8
+                                                            add_line(lines[i], "")
                                                         end
                                                         data.message = keys_buffer
                                                         keys_buffer = ""
@@ -731,21 +627,17 @@ function init_filesystem()
                                                     yield()
                                                 end
                                                 spkeys_prompt=""
-                                                add(keys_history, "iS THIS CORRECT? y/n")
-                                                keys_y += 8
+                                                add_line("iS THIS CORRECT? y/n", "")
                                                 while true do
                                                     if #keys_buffer>0 and find_char_in_string(keys_buffer, "y") then
-                                                        add(keys_history, "pOST CONFIRMED.")
-                                                        add(keys_history, "")
+                                                        add_line("pOST CONFIRMED.")
                                                         keys_buffer = ""
-                                                        keys_y += 16
 
                                                         break
                                                     elseif #keys_buffer>0 and find_char_in_string(keys_buffer, "n") then
-                                                        add(keys_history, "pOST CANCELLED.")
-                                                        add(keys_history, "")
+                                                        add_line("pOST CANCELLED.")
                                                         keys_buffer = ""
-                                                        keys_y += 16
+
                                                         key_lock = false
                                                         program_running = false
                                                         return
@@ -753,9 +645,7 @@ function init_filesystem()
                                                     yield()
                                                 end
                                                 -- send data to bbs
-                                                add(keys_history, "sENDING DATA...")
-                                                add(keys_history, "")
-                                                keys_y += 16
+                                                add_line("sENDING DATA...")
                                                 data_stream = table_print(data)
                                                 poke(0x5f80 + control_pin,2)
                                                 poke(0x5f80 + clk_pin,0)
@@ -763,16 +653,12 @@ function init_filesystem()
                                                     printh("waiting for target to receive")
                                                     yield()
                                                 end
-                                                add(keys_history, "dATA SENT.")
-                                                add(keys_history, "")
-                                                keys_y += 16
+                                                add_line("dATA SENT.")
                                                 key_lock = false
                                                 program_running = false
                                                 break
                                             elseif #keys_buffer>0 and find_char_in_string(keys_buffer, "n") then
-                                                add(keys_history, "yOU HAVE CHOSEN TO CANCEL.")
-                                                add(keys_history, "")
-                                                keys_buffer = ""
+                                                add_line("yOU HAVE CHOSEN TO CANCEL.")
                                                 keys_y += 16
                                                 key_lock = false
                                                 program_running = false
