@@ -50,6 +50,16 @@ function in_table(t,v)
     return false
 end
 
+function add_line(str, _s)
+    local s = _s or false
+    add(keys_history, str)
+    keys_y+=8
+    if not s then
+        add(keys_history, "")
+        keys_y+=8 
+    end
+end
+
 function upd_k()
     if (key_pressed) key_pressed = 0 
     while stat(30) and not bsod do
@@ -83,34 +93,25 @@ function upd_k()
                         printh("user found")
                         keys_buffer = ""
                         user = user_str
-                        add(keys_history, "uSER: "..user_str)
-                        keys_y+=8
+                        add_line("uSER: "..user_str)
                     
                     else
-                        add(keys_history, "uSER: "..user_str)
-                        add(keys_history, "uSER NOT FOUND")
-                        add(keys_history, "")
+                        add_line("uSER: "..user_str, true)
+                        add_line("uSER NOT FOUND")
                         keys_buffer = ""
-                        keys_y+=24
 
                     end
                     chk_scroll(true)
                 elseif user ~= nil and pass == nil then
-                    printh("checking pass")
                     local pass_str = keys_buffer
-                    printh("password: "..pass_str)
                     -- check if valid pass
                     if accounts[user].password == pass_str then
-                        printh("pass correct")
                         keys_buffer = ""
                         pass = pass_str
                         keys_history = {}
                         keys_y = 0
-                        add(keys_history, "wELCOME "..user)
-                        add(keys_history, "")
-                        add(keys_history, "tODAYS DATE IS "..stat(91).."/"..stat(92).."/"..stat(90))
-                        add(keys_history, "")
-                        keys_y+=32
+                        add_line("wELCOME "..user)
+                        add_line("tODAYS DATE IS "..stat(91).."/"..stat(92).."/"..stat(90))
                         current_drive = "c:"
                         current_path = "/"
                         current_dir = files[current_drive]["/"]
@@ -120,12 +121,11 @@ function upd_k()
                         for i=1,#keys_buffer do
                             pbuff = pbuff.."*"
                         end
-                        add(keys_history, "pASSWORD: "..pbuff)
-                        add(keys_history, "pASSWORD INCORRECT")
-                        add(keys_history, "")
-                        keys_buffer = ""
-                        keys_y+=24
+                        add_line("pASSWORD: "..pbuff, true)
+                        add_line("pASSWORD INCORRECT")
+
                         user = nil
+                        keys_buffer = ""
                     end
                     chk_scroll(true)
                 elseif user ~= nil and pass ~= nil and not key_lock then
@@ -141,9 +141,7 @@ function upd_k()
                             func:func()
                         end
                     else
-                        add(keys_history, "bAD COMMAND OR FILE NAME")
-                        add(keys_history, "")
-                        keys_y+=16
+                        add_line("bAD COMMAND OR FILE NAME")
                         sfx(1)
                     end
                     chk_scroll()
