@@ -2,7 +2,9 @@ returned_data = null;
 function addComment(name, comment) {
     console.log("Adding comment: ", name, comment);
     var timestamp = new Date().toLocaleString(); // Add a timestamp
-    
+    // var timestamp = new Date().toISOString(); // Add a timestamp
+    // define the timestamp as a timezone aware string for the users local timezone
+
     // Construct the Google Sheets URL with query parameters
     var sheetsURL = "https://docs.google.com/forms/d/e/1FAIpQLSf7V0IppAxTj4I464fqXmJAWlsLGVBV9h2Bi6q3oEZEECuqoQ/formResponse?";
     var formData = "entry.362293735=" + name +
@@ -45,18 +47,17 @@ function fetchComments(force) {
             const rows = JSON.parse(json[1]).table.rows.map(row => row.c.map(cell => cell.v));
 
             // Combine the columns and rows into an array of objects
-            const comments = rows.map(row => {
+            var comments = rows.map(row => {
                 return row.reduce((acc, cell, index) => {
                     acc[columns[index]] = cell;
                     return acc;
                 }, {});
             });
             comments = JSON.stringify(comments);
-            console.log("data: "+data);
-            returned_data = data;
+            console.log("comments: "+comments);
+            returned_data = comments;
             // set all characters to lowercase
             returned_data = returned_data.toLowerCase();
-            returned_data = JSON.parse(returned_data);
             console.log("returned_data: "+returned_data);
             sessionStorage.setItem("comment_store", returned_data);
             gpio[0]=4;
