@@ -8,6 +8,7 @@ __lua__
 #include ../lib/coroutines.lua
 #include ../lib/gpio.lua
 #include ../lib/fs.lua
+
 function _init()
     init_gpio()
     init_bsod()
@@ -28,9 +29,6 @@ function _init()
             password = "dev"
         }
     }
-
-
-
 end
 
 function _update60()
