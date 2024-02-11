@@ -4,6 +4,7 @@ m_on=false
 m_cr = true
 k_cur_blink = false
 function keys_init()
+
     key_lock = false
     allowed_keys = {
         "a","b","c","d","e","f","g","h","i","j","k","l","m",
@@ -19,6 +20,8 @@ function keys_init()
     keys_released = false
     keys_x = 0
     keys_y = 0
+    scroll_x = 0
+    scroll_y = 0
     make_cr(function()
         while true do
             upd_k()
