@@ -1,4 +1,5 @@
 function init_filesystem()
+    
     files = {
         ["a:"] = {
             type = nil, -- nil type signifies that there is no disk in the drive
@@ -554,7 +555,6 @@ function init_filesystem()
                                                 break
                                             elseif #keys_buffer>0 and find_char_in_string(keys_buffer, "n") then
                                                 add_line("yOU HAVE CHOSEN TO CANCEL.")
-                                                keys_y += 16
                                                 key_lock = false
                                                 program_running = false
                                                 return
@@ -580,6 +580,10 @@ function init_filesystem()
             }
         },
     }
+
+    current_path = "/"
+    current_drive = "c:"
+    current_dir = files[current_drive][current_path]
 end
 
 function check_permissions(target)
