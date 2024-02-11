@@ -20,7 +20,6 @@ function _init()
     user = nil
     pass = nil
     keys_init()
-
     accounts = {
         guest = {
             password = ""
@@ -46,8 +45,6 @@ function _draw()
     poke_crs(aroutines)
     if (m_on) draw_m()
     draw_bsod()
-
-    
 end
 
 __gfx__
