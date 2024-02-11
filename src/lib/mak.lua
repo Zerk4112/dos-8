@@ -274,3 +274,12 @@ end
 function draw_m()
     spr(0, m_x, m_y, 1, 1, false, false)
 end
+
+function find_char_in_string(string, char)
+    for i=1, #string do
+        if sub(string, i, i) == char then
+            return true
+        end
+    end
+    return false
+end
