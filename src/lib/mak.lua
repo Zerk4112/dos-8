@@ -88,11 +88,8 @@ function upd_k()
                 local sfx_num = flr(rnd(2)+59)
                 sfx(sfx_num)
                 if user == nil and pass == nil then
-                    printh("checking user")
                     local user_str = keys_buffer
-                    printh("user: "..user_str)
                     if accounts[user_str] then
-                        printh("user found")
                         keys_buffer = ""
                         user = user_str
                         add_line("uSER: "..user_str)
@@ -118,7 +115,6 @@ function upd_k()
                         current_path = "/"
                         current_dir = files[current_drive]["/"]
                     else
-                        printh("pass incorrect")
                         local pbuff = ""
                         for i=1,#keys_buffer do
                             pbuff = pbuff.."*"
@@ -148,7 +144,6 @@ function upd_k()
                     end
                     chk_scroll()
                 elseif key_lock then
-                    printh("mak: key lock is on")
                     -- keys_buffer = keys_buffer..pressed
                 end
             else

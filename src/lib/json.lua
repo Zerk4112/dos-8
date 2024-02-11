@@ -83,26 +83,21 @@ end
 function table_print(_t, r)
 	local stringified = ''
 	if (r==nil) stringified = '{'
-	printh('table_print')
 	local i = 0
 	for k,v in pairs(_t) do
 		i+=1
 		printh("i: "..i.."/ #_t: "..len(_t).." k: "..k.." v: "..v)
 		if type(v)=='table' then
-			printh('"'..k..'":{ ')
 			stringified = stringified..'"'..k..'":{ '
 			stringified = stringified..table_print(v, '')
-			printh('}, ')
 			stringified = stringified..'}, '
 		else
 			local s = ","
 			if (i==len(_t)) s = ""
-			printh('"'..k..'": "'..v..'"'..s)
 			stringified = stringified..'"'..k..'": "'..v..'"'..s
 		end
 	end
 	if (r==nil) stringified = stringified..'}'
-	printh('stringified: '..stringified)
 	return stringified
 end
 

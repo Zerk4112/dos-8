@@ -23,7 +23,6 @@ function init_filesystem()
                                     "    aRGUMENTS DEPEND ON LOADED PROGRAM."
                                 },
                                 func = function(self, args) 
-                                    printh("running loaded program: "..tostr(loaded_program))
                                     if loaded_program == nil then
                                         add_line("nO PROGRAM LOADED.")
                                         sfx(1)
@@ -216,8 +215,6 @@ function init_filesystem()
                                     else
                                         local new_path = current_path..dir
                                         local new_dir = get_dir_from_path(new_path)
-                                        printh("new_dir: "..tostr(new_dir))
-                                        printh("new_path: "..tostr(new_path))
                                         if new_dir == nil then
                                             add_line("pATH SPECIFIED IS INVALID.")
                                             sfx(1)
@@ -264,8 +261,6 @@ function init_filesystem()
                                         for i=1, 8 do
                                             hex = hex..sub("0123456789abcdef", flr(rnd(16))+1, flr(rnd(16))+1)
                                         end
-                                        printh("hex: "..hex)
-
                                         throw_bsod("read error in sector 0x")
                                     end
                                 end
@@ -409,16 +404,12 @@ function init_filesystem()
                                         poke(0x5f80 + control_pin,3) 
                                         yields(120) 
                                         while peek(0x5f80 + fetch_pin) == 255 do
-                                            printh("waiting for data")
                                             yield()
                                         end
 
                                         -- read data from data stream
-                                        printh("data ready, setting callback")
                                         gpio_callback = function()
-                                            printh("processing with new callback function")
                                             local data = json_parse(data_stream)
-                                            printh("data_stream: "..data_stream)
                                             add(keys_history, "lOADING bbs bROWSER...")
 
                                             yields(30)
@@ -465,7 +456,6 @@ function init_filesystem()
                                                 elseif btnp(1) then
                                                     scroll_x += 8
                                                 elseif key_pressed >0 then
-                                                    printh("key was pressed, break loop!")
                                                     keys_history = {}
                                                     keys_y = 0
                                                     scroll_y = 0
@@ -546,7 +536,6 @@ function init_filesystem()
                                                 poke(0x5f80 + control_pin,2)
                                                 poke(0x5f80 + clk_pin,0)
                                                 while peek(0x5f80 + control_pin) == 2 do
-                                                    printh("waiting for target to receive")
                                                     yield()
                                                 end
                                                 add_line("dATA SENT.")
@@ -591,8 +580,6 @@ function check_permissions(target)
     if target.permissions == "all" then
         return true
     else
-        printh("target.permissions: "..target.permissions)
-        printh("current dir permissions: "..dir.permissions)
         if target.permissions == user then
             return true
         end

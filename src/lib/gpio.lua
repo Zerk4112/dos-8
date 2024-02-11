@@ -19,7 +19,7 @@ function init_gpio()
         "fetch"
     }
     data_stream = ""
-    gpio_callback = function() printh("processing data_stream: "..data_stream) end
+    gpio_callback = function() printh("processing data_stream: "..data_stream) end -- default callback
     clear_pins(true)
     gpio_routine = make_cr(function()
         while true do
@@ -56,7 +56,6 @@ end
 
 function gpio_update()
     if peek(0x5f80 + error_pin) == 1 then
-        printh("error detected, clearing pins")
         clear_pins(true)
         throw_bsod("unable to fetch data from bbs", false)
     end
@@ -92,8 +91,6 @@ function receive_data()
     local data = read_data()
     local clk_val = peek(0x5f80 + clk_pin)
     if #data>0 and clk_val==255 then
-        printh("received data: " .. #data)
-
         for i=1, #data do
             printh("received data async: " .. data[i].value.. " on pin: " .. data[i].pin)
             data_stream = data_stream .. allowed_keys[data[i].value+1]
@@ -118,8 +115,6 @@ function send_data()
             data_stream = sub(data_stream, 2)
             printh("sending data: " .. data ..", index: " .. get_index_of_key(data) .. ", on pin: " .. i)
             poke(0x5f80 + i, get_index_of_key(data))
-            
-            printh("pin value: " .. peek(0x5f80 + i))
         end
         poke(0x5f80 + clk_pin, 255)
     elseif #data_stream == 0 and peek(0x5f80 + clk_pin) == 0 then
