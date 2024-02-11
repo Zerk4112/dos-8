@@ -41,39 +41,6 @@ function _init()
     current_dir = files[current_drive][current_path]
 end
 
-function init_disks()
-    disks = {
-        ["picos"] = {
-            type = "dir",
-            contents = {
-                ["picos"] = {
-                    type = "com",
-                    func = init_picos
-                },
-                ["mouse"] = {
-                    type = "com",
-                    func = mouse_init
-                }
-            }
-        }
-    }
-end
-
-function check_permissions(target)
-    local dir = get_dir_from_path(current_path)
-    if target.permissions == "all" then
-        return true
-    else
-        printh("target.permissions: "..target.permissions)
-        printh("current dir permissions: "..dir.permissions)
-        if target.permissions == user then
-            return true
-        end
-    end
-    return false
-end
-
-
 function _update60()
     poke(0x5f30,1) -- suppress pause
     poke_crs(coroutines)
