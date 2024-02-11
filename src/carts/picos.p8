@@ -8,36 +8,6 @@ __lua__
 #include ../lib/coroutines.lua
 #include ../lib/gpio.lua
 
-
-function find_char_in_string(string, char)
-    for i=1, #string do
-        if sub(string, i, i) == char then
-            return true
-        end
-    end
-    return false
-end
-
-function get_dir_from_path(path)
-    local breadcrumbs = split(path, "/")
-    for k, v in pairs(breadcrumbs) do
-        if v == "" then
-            breadcrumbs[k] = "/"
-        end
-    end
-    -- remove trailing /
-    if breadcrumbs[#breadcrumbs] == "/" then
-        breadcrumbs[#breadcrumbs] = nil
-    end
-    local dir = files[current_drive]['/']
-    if #breadcrumbs > 1 then
-        for i = 2, #breadcrumbs do
-            dir = dir.contents[breadcrumbs[i]]
-        end
-    end
-    return dir
-end
-
 function _init()
     init_gpio()
     init_bsod()
