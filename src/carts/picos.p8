@@ -7,7 +7,7 @@ __lua__
 #include ../lib/mak.lua
 #include ../lib/coroutines.lua
 #include ../lib/gpio.lua
-
+#include ../lib/fs.lua
 function _init()
     init_gpio()
     init_bsod()
@@ -18,14 +18,8 @@ function _init()
     loaded_disk = nil
     user = nil
     pass = nil
-    more = false
-    os_name = "dos-8"
-    bkgr_clr = 0
-    debug = false
-    menuitem(2, "debug", function() debug = not debug end)
     keys_init()
-    scroll_x = 0
-    scroll_y = 0
+
     accounts = {
         guest = {
             password = ""
@@ -36,9 +30,7 @@ function _init()
     }
 
 
-    current_path = "/"
-    current_drive = "c:"
-    current_dir = files[current_drive][current_path]
+
 end
 
 function _update60()
@@ -52,7 +44,7 @@ end
 
 
 function _draw()
-    cls(bkgr_clr)
+    cls(0)
     poke_crs(aroutines)
     if (m_on) draw_m()
     draw_bsod()
