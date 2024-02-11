@@ -13,7 +13,6 @@ function keys_init()
         "$","%","^","&","*","(",")","_","+","{","}","|",":",
         "\"","<",">","?","~","⁸","","\r"
     }
-    -- printh("keys_init")
     keys_history = {}
     keys_buffer = ""
     keys_pressed = false
@@ -174,21 +173,11 @@ function word_wrap(_w)
 end
 
 function draw_k()
-    -- print("kb: "..#keys_buffer, 0, 112, 7)
     if user ~= nil and pass ~= nil then
         if program_running==false then
             print(current_drive..current_path..">"..keys_buffer, keys_x, keys_y+scroll_y, 7)
         elseif program_running then
             if (spkeys_prompt==nil) spkeys_prompt=""
-            -- lines = {}
-            -- line = ""
-            -- for i=1, #keys_buffer do
-            --     line = line..sub(keys_buffer, i, i)
-            --     if #line >31 or i==#keys_buffer then
-            --         add(lines, line)
-            --         line = ""
-            --     end
-            -- end
             local lines = word_wrap()
             if (#lines>0 )print(spkeys_prompt..lines[1], keys_x, keys_y+scroll_y, 7)
             if #lines>1 then
@@ -198,8 +187,6 @@ function draw_k()
             end
             if (#lines==0) print(spkeys_prompt..keys_buffer, keys_x, keys_y+scroll_y, 7)
         end
-        -- draw keys history above the input like in linux terminal in reverse order
-        
     else
         if user == nil and pass == nil then
             print("uSER: "..keys_buffer, keys_x, keys_y, 7)
@@ -212,12 +199,9 @@ function draw_k()
         end
     end
 
-    -- if program_running == false then
         for i=#keys_history,1,-1 do
             print(keys_history[i], keys_x, keys_y-8*(#keys_history-i+1)+scroll_y, 7)
         end
-    -- end
-
     -- draw cursor as red rectangle
     if k_cur_blink then
         if program_running then
@@ -234,9 +218,6 @@ function draw_k()
         
         end
     end
-    -- for i=1,#keys_history do
-    --     print(keys_history[i], keys_x, keys_y-8*i, 7)
-    -- end
 end
 
 function upd_m()
@@ -269,11 +250,9 @@ function chk_m_clk()
 
     if stat(34)==1 then
         if not m_clk and not m_hld then
-            -- printh("mouse clicked")
             m_clk = true
             m_hld = true
             make_cr(function()
-                -- printh("mouse held")
                 local t = 0
                 while m_hld do
                     t+=1
